@@ -60,6 +60,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           update-file: package.json
           changelog-generator-opt: 'emojis=true'
+          allow-initial-development-versions: true
   
   publish:
     name: Publish
