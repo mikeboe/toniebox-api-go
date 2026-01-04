@@ -1,0 +1,24 @@
+{
+  "name": "toniebox-api-go",
+  "version": "1.0.0",
+  "description": "A Go library for interacting with the Toniebox Cloud API. Control your Creative-Tonies, upload audio files, manage chapters, and more - all from your Go applications.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikeboe/toniebox-api-go.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mikeboe/toniebox-api-go/issues"
+  },
+  "homepage": "https://github.com/mikeboe/toniebox-api-go#readme"
+}

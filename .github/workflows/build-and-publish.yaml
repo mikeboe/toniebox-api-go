@@ -1,0 +1,78 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+      - name: Build
+        run: go build -o toniebox-api-go main.go
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+      - name: Test
+        run: go test ./...
+
+  version:
+    name: Create Version
+    runs-on: ubuntu-latest
+    needs: test
+    permissions: write-all
+    outputs:
+      version: ${{ steps.semantic-release.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: go-semantic-release/action@v1
+        id: semantic-release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-file: package.json
+          changelog-generator-opt: 'emojis=true'
+  
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: version
+    permissions: write-all
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+      - name: Publish
+        run: GOPROXY=proxy.golang.org go list -m github.com/mikeboe/toniebox-api-go@${{ steps.version.outputs.version }}
+    
