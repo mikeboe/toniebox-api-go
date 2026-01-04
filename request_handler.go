@@ -184,13 +184,27 @@ func (rh *requestHandler) uploadFile(tonie *CreativeTonie, filePath, title strin
 
 	// Add form fields
 	fields := amazonBean.Request.Fields
-	writer.WriteField("key", fields.Key)
-	writer.WriteField("x-amz-algorithm", fields.XAmzAlgorithm)
-	writer.WriteField("x-amz-credential", fields.XAmzCredential)
-	writer.WriteField("x-amz-date", fields.XAmzDate)
-	writer.WriteField("policy", fields.Policy)
-	writer.WriteField("x-amz-signature", fields.XAmzSignature)
-	writer.WriteField("x-amz-security-token", fields.XAmzSecurityToken)
+	if err := writer.WriteField("key", fields.Key); err != nil {
+		return fmt.Errorf("failed to write key field: %w", err)
+	}
+	if err := writer.WriteField("x-amz-algorithm", fields.XAmzAlgorithm); err != nil {
+		return fmt.Errorf("failed to write x-amz-algorithm field: %w", err)
+	}
+	if err := writer.WriteField("x-amz-credential", fields.XAmzCredential); err != nil {
+		return fmt.Errorf("failed to write x-amz-credential field: %w", err)
+	}
+	if err := writer.WriteField("x-amz-date", fields.XAmzDate); err != nil {
+		return fmt.Errorf("failed to write x-amz-date field: %w", err)
+	}
+	if err := writer.WriteField("policy", fields.Policy); err != nil {
+		return fmt.Errorf("failed to write policy field: %w", err)
+	}
+	if err := writer.WriteField("x-amz-signature", fields.XAmzSignature); err != nil {
+		return fmt.Errorf("failed to write x-amz-signature field: %w", err)
+	}
+	if err := writer.WriteField("x-amz-security-token", fields.XAmzSecurityToken); err != nil {
+		return fmt.Errorf("failed to write x-amz-security-token field: %w", err)
+	}
 
 	// Add file
 	part, err := writer.CreateFormFile("file", fields.Key)
@@ -202,7 +216,9 @@ func (rh *requestHandler) uploadFile(tonie *CreativeTonie, filePath, title strin
 		return fmt.Errorf("failed to copy file: %w", err)
 	}
 
-	writer.Close()
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("failed to close writer: %w", err)
+	}
 
 	// Upload to S3
 	s3Req, err := http.NewRequest("POST", fileUploadAmazon, body)

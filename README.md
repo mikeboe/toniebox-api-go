@@ -209,7 +209,7 @@ For detailed API documentation, see the [GoDoc](https://pkg.go.dev/github.com/mi
 
 ## Requirements
 
-- Go 1.16 or higher
+- Go 1.21 or higher
 - Active Toniebox account
 - Internet connection
 
