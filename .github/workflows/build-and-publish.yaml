@@ -23,7 +23,7 @@ jobs:
         with:
           go-version: '1.25'
       - name: Build
-        run: go build -o toniebox-api-go main.go
+        run: go build
 
   test:
     name: Test
