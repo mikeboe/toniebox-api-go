@@ -53,12 +53,46 @@ func NewClientWithProxy(proxyURL string) (*Client, error) {
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func (c *Client) Login(username, password string) error {
+//
+// Login authenticates the user with their Toniebox account credentials.
+// This must be called before any other API methods.
+//
+// Parameters:
+//   - username: The email address for your Toniebox account
+//   - password: The password for your Toniebox account
+//
+// Returns the authentication token (including refresh token) or an error if authentication fails.
+//
+// Example:
+//
+//	token, err := client.Login("user@example.com", "password")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Printf("Refresh Token: %s\n", token.RefreshToken)
+func (c *Client) Login(username, password string) (*JWTToken, error) {
 	login := &Login{
 		Email:    username,
 		Password: password,
 	}
 	return c.requestHandler.login(login)
+}
+
+// SetToken sets the authentication token directly, bypassing the login process.
+// This is useful if you have a stored refresh token or access token.
+//
+// Parameters:
+//   - token: The JWT token to use
+//
+// Example:
+//
+//	token := &toniebox.JWTToken{
+//	    AccessToken: "...",
+//	    RefreshToken: "...",
+//	}
+//	client.SetToken(token)
+func (c *Client) SetToken(token *JWTToken) {
+	c.requestHandler.jwtToken = token
 }
 
 // GetMe retrieves personal information about the authenticated user.

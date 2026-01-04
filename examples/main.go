@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -27,9 +29,12 @@ func main() {
 
 	// Login to the Toniebox API
 	fmt.Println("Logging in...")
-	if err := client.Login(username, password); err != nil {
+	token, err := client.Login(username, password)
+	if err != nil {
 		log.Fatalf("Login failed: %v", err)
 	}
+	fmt.Printf("✓ Login successful (Access Token: %s...)\n", token.AccessToken[:10])
+	fmt.Printf("✓ Login successful (Refresh Token: %s...)\n", token.RefreshToken[:10])
 	fmt.Println("✓ Login successful")
 
 	// Get personal information
@@ -138,7 +143,59 @@ func main() {
 				}
 			}
 		*/
+
+		// Example: Upload a file from URL (commented out to avoid unwanted changes)
+
+		// fmt.Println("\nExample: Uploading a file from URL (commented out)")
+		// fileURL := "https://storage.googleapis.com/....mp3"
+		// localPath, err := downloadFile(fileURL)
+		// if err != nil {
+		// 	log.Printf("Failed to download file: %v", err)
+		// } else {
+		// 	defer os.Remove(localPath) // Clean up temp file
+
+		// 	if err := tonie.UploadFile("My URL Story", localPath); err != nil {
+		// 		log.Printf("Failed to upload: %v", err)
+		// 	} else {
+		// 		if err := tonie.Commit(); err != nil {
+		// 			log.Printf("Failed to commit: %v", err)
+		// 		} else {
+		// 			fmt.Println("✓ File from URL uploaded")
+		// 		}
+		// 	}
+		// }
+
 	}
 
 	fmt.Println("\n✓ Example completed successfully!")
+}
+
+// downloadFile downloads a file from a URL to a temporary file and returns the path
+func downloadFile(url string) (string, error) {
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp("", "tonie-upload-*.mp3")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp file: %v", err)
+	}
+	defer tmpFile.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", fmt.Errorf("failed to download file: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check server response
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	// Writer the body to file
+	_, err = io.Copy(tmpFile, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to write to file: %v", err)
+	}
+
+	return tmpFile.Name(), nil
 }

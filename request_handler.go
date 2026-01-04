@@ -48,7 +48,7 @@ func newRequestHandlerWithProxy(proxyURL string) (*requestHandler, error) {
 }
 
 // login authenticates the user and stores the JWT token
-func (rh *requestHandler) login(loginData *Login) error {
+func (rh *requestHandler) login(loginData *Login) (*JWTToken, error) {
 	data := url.Values{}
 	data.Set("grant_type", grantTypePassword)
 	data.Set("client_id", clientID)
@@ -58,29 +58,29 @@ func (rh *requestHandler) login(loginData *Login) error {
 
 	req, err := http.NewRequest("POST", openIDConnect, strings.NewReader(data.Encode()))
 	if err != nil {
-		return fmt.Errorf("failed to create login request: %w", err)
+		return nil, fmt.Errorf("failed to create login request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", contentTypeForm)
 
 	resp, err := rh.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("login request failed: %w", err)
+		return nil, fmt.Errorf("login request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("login failed with status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("login failed with status %d: %s", resp.StatusCode, string(body))
 	}
 
 	var token JWTToken
 	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
-		return fmt.Errorf("failed to decode token: %w", err)
+		return nil, fmt.Errorf("failed to decode token: %w", err)
 	}
 
 	rh.jwtToken = &token
-	return nil
+	return &token, nil
 }
 
 // getMe retrieves personal information about the authenticated user
