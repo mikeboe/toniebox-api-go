@@ -45,7 +45,6 @@ func main() {
     if err := client.Login("user@example.com", "password"); err != nil {
         log.Fatal(err)
     }
-    defer client.Disconnect()
     
     // Get your households
     households, err := client.GetHouseholds()
@@ -198,7 +197,6 @@ For detailed API documentation, see the [GoDoc](https://pkg.go.dev/github.com/mi
 - `GetMe()` - Get your user information
 - `GetHouseholds()` - List all households you belong to
 - `GetCreativeTonies(household)` - List Creative-Tonies in a household
-- `Disconnect()` - Terminate the session
 
 #### CreativeTonie Methods
 - `UploadFile(title, filePath)` - Upload an audio file

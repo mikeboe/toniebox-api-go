@@ -251,31 +251,6 @@ func (rh *requestHandler) uploadFile(tonie *CreativeTonie, filePath, title strin
 	return nil
 }
 
-// disconnect terminates the session
-func (rh *requestHandler) disconnect() error {
-	req, err := http.NewRequest("DELETE", session, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create disconnect request: %w", err)
-	}
-
-	if rh.jwtToken != nil {
-		req.Header.Set("Authorization", "Bearer "+rh.jwtToken.AccessToken)
-	}
-
-	resp, err := rh.client.Do(req)
-	if err != nil {
-		return fmt.Errorf("disconnect request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("disconnect failed with status %d: %s", resp.StatusCode, string(body))
-	}
-
-	return nil
-}
-
 // executeGetRequest performs a GET request with authentication
 func (rh *requestHandler) executeGetRequest(url string, result interface{}) error {
 	req, err := http.NewRequest("GET", url, nil)

@@ -5,10 +5,15 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	toniebox "github.com/mikeboe/toniebox-api-go"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	// Get credentials from environment variables
 	username := os.Getenv("TONIEBOX_USERNAME")
 	password := os.Getenv("TONIEBOX_PASSWORD")
@@ -26,16 +31,6 @@ func main() {
 		log.Fatalf("Login failed: %v", err)
 	}
 	fmt.Println("✓ Login successful")
-
-	// Make sure to disconnect when done
-	defer func() {
-		fmt.Println("\nDisconnecting...")
-		if err := client.Disconnect(); err != nil {
-			log.Printf("Warning: Disconnect failed: %v", err)
-		} else {
-			fmt.Println("✓ Disconnected")
-		}
-	}()
 
 	// Get personal information
 	fmt.Println("\nFetching user information...")

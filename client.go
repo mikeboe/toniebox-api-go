@@ -116,16 +116,6 @@ func (c *Client) GetCreativeTonies(household *Household) ([]CreativeTonie, error
 	return c.requestHandler.getCreativeTonies(household)
 }
 
-// Disconnect terminates the session with the Toniebox API.
-// This should be called when you're done interacting with the API.
-//
-// Example:
-//
-//	defer client.Disconnect()
-func (c *Client) Disconnect() error {
-	return c.requestHandler.disconnect()
-}
-
 // FindChapterByTitle searches for a chapter with the given title on this Creative-Tonie.
 //
 // Parameters:
